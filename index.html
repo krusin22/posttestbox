@@ -2,20 +2,21 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mystery Box | Luxury Edition</title>
+    <!-- ตั้งค่า Viewport ให้รองรับมือถือและป้องกันการซูมโดยไม่ตั้งใจ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mystery Box | All Devices Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0a0a12;
-            --card-bg: #14142b;
-            --primary: #d4af37; /* สีทอง */
+            --card-bg: rgba(20, 20, 43, 0.85);
+            --primary: #d4af37; /* สีทองหรูหรา */
             --primary-hover: #e6c250;
             --text: #e0e0e0;
             --text-muted: #999;
             --success: #00e676;
             --danger: #ff5252;
-            --box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
             --luxury-gradient: linear-gradient(135deg, #14142b 0%, #0a0a12 100%);
         }
 
@@ -30,20 +31,26 @@
         body {
             background-color: var(--bg-color);
             color: var(--text);
+            /* ใช้ 100dvh แก้ปัญหาแถบ URL บนมือถือ และ env() สำหรับรอยบาก iPhone */
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            /* เว้นระยะขอบปลอดภัยสำหรับ iPhone / iPad */
+            padding: calc(20px + env(safe-area-inset-top)) 
+                     calc(15px + env(safe-area-inset-right)) 
+                     calc(20px + env(safe-area-inset-bottom)) 
+                     calc(15px + env(safe-area-inset-left));
             overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1a1a3a 0%, #0a0a12 70%);
         }
 
         /* Header */
         header {
             text-align: center;
-            margin-bottom: 25px;
-            margin-top: 10px;
+            margin-bottom: 20px;
+            width: 100%;
             opacity: 0;
             animation: fadeInDown 0.6s ease forwards;
         }
@@ -51,17 +58,17 @@
         h1 {
             color: var(--primary);
             font-weight: 700;
-            font-size: clamp(26px, 6vw, 36px);
+            font-size: clamp(24px, 6vw, 36px);
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 5px;
-            text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+            text-shadow: 0 2px 15px rgba(212, 175, 55, 0.4);
         }
 
         .subtitle {
             color: var(--text-muted);
             font-weight: 300;
-            font-size: clamp(14px, 3vw, 16px);
+            font-size: clamp(13px, 3.5vw, 16px);
             letter-spacing: 1px;
         }
 
@@ -69,6 +76,10 @@
         .main-container {
             max-width: 900px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: center;
             opacity: 0;
             animation: zoomIn 0.6s ease 0.2s forwards;
         }
@@ -76,59 +87,52 @@
         /* Grid */
         .grid-boxes {
             display: grid;
+            /* มือถือจอเล็ก: 4 คอลัมน์ */
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
+            width: 100%;
             perspective: 1000px;
         }
 
+        /* แท็บเล็ต iPad และ PC: 5 คอลัมน์ */
         @media (min-width: 600px) {
             .grid-boxes {
                 grid-template-columns: repeat(5, 1fr);
-                gap: 18px;
+                gap: 15px;
             }
         }
 
         /* กล่อง */
         .box {
             background: var(--card-bg);
-            border: 2px solid transparent;
-            border-radius: 16px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
             aspect-ratio: 1;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--box-shadow);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
             transform-style: preserve-3d;
             user-select: none;
+            backdrop-filter: blur(5px);
         }
 
-        .box::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(45deg, var(--primary), transparent, var(--primary));
-            border-radius: 16px;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: -1;
-            filter: blur(5px);
-        }
-
-        @media (hover: hover) {
+        /* Hover Effect (เฉพาะบน PC) */
+        @media (hover: hover) and (pointer: fine) {
             .box:hover:not(:disabled) {
-                transform: translateY(-5px) rotateY(5deg);
+                transform: translateY(-5px);
                 border-color: var(--primary);
-            }
-            .box:hover:not(:disabled)::before {
-                opacity: 0.6;
+                box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
             }
         }
 
+        /* Active Effect (เมื่อเอานิ้วกดบนมือถือ) */
         .box:active:not(:disabled) {
             transform: scale(0.92);
+            background: rgba(212, 175, 55, 0.1);
         }
 
         .box:disabled {
@@ -136,17 +140,14 @@
         }
 
         .box-number {
-            font-size: clamp(20px, 4vw, 28px);
+            font-size: clamp(18px, 5vw, 28px);
             font-weight: 700;
-            color: var(--text);
+            color: var(--primary);
             transition: all 0.3s ease;
-            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .box-icon {
-            font-size: clamp(24px, 5vw, 32px);
+            font-size: clamp(24px, 6vw, 36px);
             opacity: 0;
             transform: scale(0) rotate(-180deg);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -154,9 +155,9 @@
         }
 
         .box.opened {
-            background: #10101f;
-            border-color: #333;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+            background: #11111a;
+            border-color: #222;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
 
         .box.opened .box-number {
@@ -172,21 +173,23 @@
         /* แผงสถานะ */
         .status-panel {
             background: var(--card-bg);
-            padding: 18px 20px;
-            border-radius: 16px;
-            margin-top: 25px;
-            font-size: clamp(14px, 3.5vw, 16px);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: clamp(13px, 3.5vw, 16px);
             box-shadow: var(--box-shadow);
             border: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex-wrap: wrap; /* ให้ปุ่มปัดลงมาบรรทัดใหม่ได้ถ้าจอมือถือเล็กมาก */
         }
 
         .status-text {
             color: var(--text-muted);
             flex: 1;
+            min-width: 60%;
         }
 
         .status-highlight {
@@ -197,15 +200,18 @@
         .btn-reset {
             background: transparent;
             color: var(--text-muted);
-            border: 1px solid #444;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-size: 13px;
+            border: 1px solid #555;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .btn-reset:active {
+            transform: scale(0.95);
         }
 
         .btn-reset:hover {
@@ -214,12 +220,12 @@
             border-color: var(--primary);
         }
 
-        /* Modal */
+        /* Modal (ป๊อปอัพ) */
         .modal-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -236,28 +242,17 @@
 
         .modal-content {
             background: var(--luxury-gradient);
-            padding: 35px 25px;
+            padding: 30px 20px;
             border-radius: 20px;
             text-align: center;
             max-width: 400px;
             width: 100%;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            max-height: 90vh; /* ป้องกันป๊อปอัพทะลุจอถ้าตะแคงมือถือเล่น */
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
             border: 1px solid var(--primary);
-            transform: scale(0.8) translateY(20px);
+            transform: scale(0.9) translateY(20px);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .modal-content::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
-            z-index: -1;
         }
 
         .modal-overlay.open .modal-content {
@@ -266,21 +261,20 @@
 
         .modal-icon {
             font-size: 50px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             display: block;
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3));
         }
 
         .modal-title {
-            font-size: clamp(22px, 5vw, 26px);
+            font-size: clamp(20px, 5.5vw, 26px);
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .modal-desc {
-            font-size: clamp(16px, 4vw, 18px);
+            font-size: clamp(15px, 4vw, 17px);
             color: var(--text);
             margin-bottom: 25px;
             line-height: 1.5;
@@ -294,12 +288,21 @@
 
         .btn-group {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
+            /* มือถือจอเล็กมาก (เช่น iPhone SE) ให้ปุ่มเรียงแนวตั้ง */
+            flex-direction: column; 
+        }
+
+        /* มือถือทั่วไป แท็บเล็ต PC ให้ปุ่มเรียงแนวนอน */
+        @media (min-width: 360px) {
+            .btn-group {
+                flex-direction: row;
+            }
         }
 
         .modal-btn {
-            padding: 12px;
+            padding: 14px;
             border-radius: 10px;
             font-weight: 600;
             font-size: 15px;
@@ -307,27 +310,17 @@
             border: none;
             flex: 1;
             transition: all 0.2s ease;
-            letter-spacing: 0.5px;
+            min-height: 48px; /* Touch target มาตรฐาน iOS/Android */
         }
 
         .modal-btn:active {
             transform: scale(0.95);
+            opacity: 0.9;
         }
 
-        .btn-ok {
-            background: var(--primary);
-            color: var(--bg-color);
-        }
-        
-        .btn-action-yes {
-            background: var(--success);
-            color: #000;
-        }
-
-        .btn-action-no {
-            background: var(--danger);
-            color: white;
-        }
+        .btn-ok { background: var(--primary); color: var(--bg-color); }
+        .btn-action-yes { background: var(--success); color: #000; }
+        .btn-action-no { background: var(--danger); color: white; }
 
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
@@ -335,7 +328,7 @@
         }
 
         @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.9); }
+            from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
     </style>
@@ -344,34 +337,34 @@
 
     <header>
         <h1>Mystery Box</h1>
-        <div class="subtitle">LUXURY EDITION</div>
+        <div class="subtitle">PREMIUM EDITION • ALL DEVICES</div>
     </header>
 
     <div class="main-container">
-        <div class="grid-boxes" id="boxGrid">
-            <!-- สร้างกล่องผ่าน JavaScript -->
-        </div>
+        <!-- พื้นที่กล่องสุ่ม -->
+        <div class="grid-boxes" id="boxGrid"></div>
 
+        <!-- แผงบอกสถานะ -->
         <div class="status-panel">
             <span class="status-text" id="statusText">สถานะ: <span class="status-highlight">พร้อมเสี่ยงโชค!</span></span>
-            <button class="btn-reset" onclick="initGame()">เริ่มใหม่</button>
+            <button class="btn-reset" onclick="initGame()">เริ่มเกมใหม่</button>
         </div>
     </div>
 
-    <!-- Modal ป๊อปอัพ -->
+    <!-- Modal (ป๊อปอัพ) -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
             <span id="modalIcon" class="modal-icon"></span>
             <h2 class="modal-title" id="modalTitle"></h2>
             <p class="modal-desc" id="modalDesc"></p>
             <div id="modalActionButtons" class="btn-group">
-                <!-- ปุ่มจะถูกสร้างตรงนี้ -->
+                <!-- ปุ่มจะถูกสร้างผ่าน JavaScript -->
             </div>
         </div>
     </div>
 
     <script>
-        // ข้อมูลสุ่มท่าทาง
+        // รายการสุ่มท่าทาง
         const actionsList = [
             "ยิ้มหวานให้กล้อง 10 วินาที 😁",
             "ทำท่าแมวเหมียวอ้อนๆ 🐱",
@@ -383,7 +376,7 @@
             "ส่งจูบให้หน้าจอ 2 ครั้ง 😘"
         ];
 
-        // รายละเอียดของผลลัพธ์แต่ละแบบ
+        // รายละเอียดรางวัล
         const outcomeDetails = {
             'continue': { text: "เล่นต่อ", icon: "🎉", titleColor: "var(--success)" },
             'rest1': { text: "พัก 1 ตา", icon: "☕️", titleColor: "var(--danger)" },
@@ -395,12 +388,12 @@
 
         // สัดส่วนของรางวัลใน 20 กล่อง
         const boxDistribution = [
-            'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', // 9 เล่นต่อ
-            'rest1', 'rest1', 'rest1', // 3 พัก 1 ตา
-            'rest2', 'rest2', // 2 พัก 2 ตา
-            'rest3', // 1 พัก 3 ตา
-            'rest5', // 1 พัก 5 ตา
-            'action', 'action', 'action', 'action' // 4 สุ่มท่าทาง
+            'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
+            'rest1', 'rest1', 'rest1',
+            'rest2', 'rest2',
+            'rest3',
+            'rest5',
+            'action', 'action', 'action', 'action'
         ];
 
         let gameBoxes = [];
@@ -414,7 +407,6 @@
         const modalDesc = document.getElementById('modalDesc');
         const modalActionButtons = document.getElementById('modalActionButtons');
 
-        // ฟังก์ชันสลับ Array
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
             while (currentIndex != 0) {
@@ -425,13 +417,10 @@
             return array;
         }
 
-        // เริ่มเกม
         function initGame() {
             gridEl.innerHTML = '';
             openedCount = 0;
             statusText.innerHTML = "สถานะ: <span class='status-highlight'>พร้อมเสี่ยงโชค!</span>";
-            
-            // สับไพ่ผลลัพธ์
             gameBoxes = shuffle([...boxDistribution]);
 
             for (let i = 0; i < 20; i++) {
@@ -448,13 +437,16 @@
                 box.appendChild(numberSpan);
                 box.appendChild(iconSpan);
 
-                box.onclick = () => openBox(i, box, iconSpan);
+                // รองรับทั้งคลิกบน PC และแตะบนมือถือ
+                box.onclick = (e) => {
+                    e.preventDefault();
+                    openBox(i, box, iconSpan);
+                };
                 gridEl.appendChild(box);
             }
             closeModal();
         }
 
-        // เปิดกล่อง
         function openBox(index, boxEl, iconEl) {
             if (boxEl.disabled) return;
             
@@ -467,13 +459,12 @@
             
             iconEl.innerText = details.icon;
             
-            // หน่วงเวลาเล็กน้อยให้แอนิเมชั่นกล่องพลิกทำงานก่อนแสดงป๊อปอัพ
+            // รอแอนิเมชันพลิกกล่อง 450ms ก่อนแสดง Modal
             setTimeout(() => {
                 showModal(resultType, details);
             }, 450); 
         }
 
-        // แสดงป๊อปอัพ
         function showModal(resultType, details) {
             modalIcon.innerText = details.icon;
             modalTitle.style.color = details.titleColor;
@@ -502,7 +493,7 @@
             } else if (resultType === 'action') {
                 modalTitle.innerText = "ภารกิจพิเศษ!";
                 const randomAction = actionsList[Math.floor(Math.random() * actionsList.length)];
-                modalDesc.innerHTML = `ท่าที่คุณต้องทำคือ:<br><br><span style="font-size: 22px; color: var(--primary);"><b>"${randomAction}"</b></span><br><br>ทำสำเร็จหรือไม่?`;
+                modalDesc.innerHTML = `ท่าที่คุณต้องทำคือ:<br><br><span style="font-size: clamp(18px, 5vw, 22px); color: var(--primary); display:block; margin-top:10px;"><b>"${randomAction}"</b></span><br>ทำสำเร็จหรือไม่?`;
 
                 const btnYes = document.createElement('button');
                 btnYes.className = 'modal-btn btn-action-yes';
@@ -521,24 +512,22 @@
             modalOverlay.classList.add('open');
         }
 
-        // อัปเดตข้อความสถานะด้านล่าง
         function updateStatus(text) {
             closeModal();
             statusText.innerHTML = `ล่าสุด: <span class='status-highlight'>${text}</span> (เปิดแล้ว ${openedCount}/20)`;
             
             if (openedCount >= 20) {
                 setTimeout(() => {
-                    statusText.innerHTML = `<span style='color: var(--success)'>🎉 เปิดครบทุกกล่องแล้ว!</span>`;
-                }, 500);
+                    statusText.innerHTML = `<span style='color: var(--success); font-weight: bold;'>🎉 เปิดครบทุกกล่องแล้ว!</span>`;
+                }, 400);
             }
         }
 
-        // ปิดป๊อปอัพ
         function closeModal() {
             modalOverlay.classList.remove('open');
         }
 
-        // เริ่มเกมตอนโหลดหน้าเว็บ
+        // โหลดเกมครั้งแรก
         initGame();
     </script>
 </body>
